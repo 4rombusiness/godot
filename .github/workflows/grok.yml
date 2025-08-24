@@ -1,0 +1,36 @@
+name: Build Custom Web Export Template GROK
+
+on: [workflow_dispatch]  # Allows manual triggering from the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: 4.4  # Or your branch name
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev python3 python3-pip
+
+    - name: Set up Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: latest
+        actions-cache-folder: 'emsdk-cache'
+
+    - name: Build custom web template
+      run: |
+        source "$EMSDK/emsdk_env.sh"
+        scons platform=web target=template_release disable_3d=yes optimize=size --jobs=$(nproc)
+        mv bin/godot.web.template_release.wasm32.zip bin/custom_web_template_release.zip
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: custom-web-template
+        path: bin/custom_web_template_release.zip
