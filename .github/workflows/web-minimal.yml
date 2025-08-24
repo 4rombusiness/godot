@@ -67,7 +67,7 @@ jobs:
       - name: Compilation
         uses: ./.github/actions/godot-build
         with:
-          scons_flags: ${{ env.SCONS_FLAGS}} ${{ matrix.scons_flags }}
+          sconsflags: ${{ env.SCONS_FLAGS}} ${{ matrix.scons_flags }}
           platform: web
           target: ${{ matrix.target }}
 
